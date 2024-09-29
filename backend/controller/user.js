@@ -1,21 +1,29 @@
 const User = require('../Model/user');
-const bcrypt = require('bcryptsjs');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 
 //  User Register
 const Register = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { name, email, password } = req.body;
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User already exists', success: false });
+        }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = new User({ email, password: hashedPassword });
+        const user = new User({ name, email, password: hashedPassword });
         await user.save();
-        res.status(201).send({messgae: 'user registered successfully', success: true});
+        res.status(201).send({ messgae: 'user registered successfully', success: true });
 
     } catch (err) {
         console.error(err.message);
+        if (err.code === 11000) { // Handle duplicate key error
+            return res.status(400).json({ message: 'Email already registered', success: false });
+        }
         return res.status(500).send({ message: 'sevre error', success: false });
     }
 }
@@ -33,11 +41,11 @@ const Login = async (req, res) => {
             return res.status(400).send('Invalid credentials');
         }
         const validPassword = await bcrypt.compare(password, user.password);
-        if(!validPassword){
+        if (!validPassword) {
             return res.status(400).send('Please enter valid password')
         }
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {expiresIn: '1h'});
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.json({ token, message: 'Login Successsful', success: true });
 
     } catch (err) {
@@ -47,27 +55,51 @@ const Login = async (req, res) => {
 }
 
 // Shopify API controller (Fetching Orders)
-const getShopifyOrders = async (req, res)=>{
-    try{
-        const response = await axios.get(`${process.env.SHOPIFY_STORE_URL}`, {
+const getShopifyOrders = async (req, res) => {
+    try {
+        const response = await axios.get(`${process.env.SHOPIFY_STORE_URL}?status=any`, {
             headers: {
-                'X-Shopify_Access-Token': process.env.SHOPIFY-ACCES-TokenExpiredError,
+                'X-Shopify-Access-Token': process.env.SHOPIFY_ACCESS_TOKEN,
             },
         });
 
         const orders = response.data.orders;
-        const totalOrders = orders.length;
-        const totalSales = orders.reduce((sum, order) => sum + parseFloat(order.total_price), 0);
-        const conversionRate = (totalOrdres / 1000) * 100; // Assuming 1000 visitors for caluculation
 
-        res.json({
+        // const totalOrders = orders.length;
+        // const totalSales = orders.reduce((sum, order) => sum + parseFloat(order.total_price), 0);
+        // const conversionRate = (totalOrders / 1000) * 100; // Assuming 1000 visitors for caluculation
+
+        // res.json({
+        //     totalOrders,
+        //     totalSales,
+        //     conversionRate: conversionRate.toFixed(2),
+        // });
+        if (!orders || orders.length === 0) {
+            return res.status(200).json({
+              totalOrders: 0,
+              totalSales: 0,
+              conversionRate: '0.00',
+              message: 'No orders found in the Shopify store'
+            });
+          }
+      
+          // Calculating total orders and total sales
+          const totalOrders = orders.length;
+          const totalSales = orders.reduce((sum, order) => sum + parseFloat(order.total_price), 0);
+      
+          // Basic conversion rate calculation (assuming 1000 visitors for simplicity)
+          const conversionRate = (totalOrders / 1000) * 100;
+      
+          // Sending the response
+          res.status(200).json({
             totalOrders,
-            totalSales,
+            totalSales: totalSales.toFixed(2),
             conversionRate: conversionRate.toFixed(2),
-        });
-    }catch(err){
-        console.error(err.message);
-        res.status(500).send({messsage: 'Error fetching Shopify orders', success: false})
+          });
+
+    } catch (err) {
+        console.error(err.message, err.response?.data || err.message);
+        res.status(500).send({ messsage: 'Error fetching Shopify orders', success: false })
     }
 }
 
