@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require ('cors');
 require('dotenv').config();
 
+const UserRoutes = require('./routes/user')
+
 
 const app = express()
 app.use(express.json())
@@ -16,10 +18,7 @@ mongoose.connect(process.env.Mongo_Uri)
     console.log(error)
 })
 
-
-app.get('/', (req, res)=>{
-    res.send('Hello Khushi')
-});
+app.use('/shopify', UserRoutes)
 
 app.listen(7000, ()=>{
     console.log(`Server is running at 7000`)
