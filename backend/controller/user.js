@@ -55,6 +55,7 @@ const Login = async (req, res) => {
 }
 
 // Shopify API controller (Fetching Orders)
+
 const getShopifyOrders = async (req, res) => {
     try {
         const response = await axios.get(`${process.env.SHOPIFY_STORE_URL}?status=any`, {
@@ -65,42 +66,36 @@ const getShopifyOrders = async (req, res) => {
 
         const orders = response.data.orders;
 
-        // const totalOrders = orders.length;
-        // const totalSales = orders.reduce((sum, order) => sum + parseFloat(order.total_price), 0);
-        // const conversionRate = (totalOrders / 1000) * 100; // Assuming 1000 visitors for caluculation
-
-        // res.json({
-        //     totalOrders,
-        //     totalSales,
-        //     conversionRate: conversionRate.toFixed(2),
-        // });
+        // Check if orders exist
         if (!orders || orders.length === 0) {
             return res.status(200).json({
-              totalOrders: 0,
-              totalSales: 0,
-              conversionRate: '0.00',
-              message: 'No orders found in the Shopify store'
+                totalOrders: 0,
+                totalSales: 0,
+                conversionRate: '0.00',
+                orders: [],
+                message: 'No orders found in the Shopify store'
             });
-          }
-      
-          // Calculating total orders and total sales
-          const totalOrders = orders.length;
-          const totalSales = orders.reduce((sum, order) => sum + parseFloat(order.total_price), 0);
-      
-          // Basic conversion rate calculation (assuming 1000 visitors for simplicity)
-          const conversionRate = (totalOrders / 1000) * 100;
-      
-          // Sending the response
-          res.status(200).json({
+        }
+
+        // Calculating total orders and total sales
+        const totalOrders = orders.length;
+        const totalSales = orders.reduce((sum, order) => sum + parseFloat(order.total_price), 0);
+
+        // Basic conversion rate calculation (assuming 1000 visitors for simplicity)
+        const conversionRate = (totalOrders / 1000) * 100;
+
+        // Sending the response with the order list included
+        res.status(200).json({
             totalOrders,
             totalSales: totalSales.toFixed(2),
             conversionRate: conversionRate.toFixed(2),
-          });
-
+            orders: orders,  // Include the order list in the response
+        });
     } catch (err) {
         console.error(err.message, err.response?.data || err.message);
-        res.status(500).send({ messsage: 'Error fetching Shopify orders', success: false })
+        res.status(500).send({ message: 'Error fetching Shopify orders', success: false });
     }
-}
+};
+
 
 module.exports = { Register, Login, getShopifyOrders }
