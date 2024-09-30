@@ -74,7 +74,7 @@ const Dashboard = () => {
                 </Col>
             </Row>
             <Row className="align-items-center">
-                <Col xs="auto"> {/* This column will adjust its width based on the content */}
+                <Col xs="auto">
                     <Button variant="primary" onClick={fetchOrderData} className="mb-3">Refresh Data</Button>
                 </Col>
                 <Col xs="auto">
@@ -82,7 +82,7 @@ const Dashboard = () => {
                         {isAutoRefresh ? 'Disable Auto Refresh' : 'Enable Auto Refresh'}
                     </Button>
                 </Col>
-                <Col className="text-end"> {/* Aligns content to the right */}
+                <Col className="text-end">
                     <Dropdown className="mb-3">
                         <Dropdown.Toggle variant="success" id="dropdown-basic">
                             Sort By: {sortOrder === 'date' ? 'Date' : 'Sales'}
