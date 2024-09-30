@@ -12,7 +12,7 @@ const ShopifyNavbar = () => {
     const handleLogout = () => {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
-        checkLoginStatus(); // Update the login status
+        checkLoginStatus();
         navigate('/');
     };
 
