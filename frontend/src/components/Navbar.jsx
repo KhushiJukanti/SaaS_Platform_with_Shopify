@@ -21,7 +21,7 @@ const ShopifyNavbar = () => {
             <Navbar expand="lg" style={{ backgroundColor: '#e3f2fd' }}>
                 <Container>
                     <Navbar.Brand as={Link} to="#">
-                        E-commerce
+                        Shopify
                     </Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
