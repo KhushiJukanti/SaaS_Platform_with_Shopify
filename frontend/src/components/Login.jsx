@@ -29,7 +29,7 @@ const Login = () => {
             ...formData,
             [e.target.name]: e.target.value
         });
-        setErrors({ ...errors, [e.target.name]: '' }); // Clear error as user types
+        setErrors({ ...errors, [e.target.name]: '' }); 
     };
 
     // Form submit handler
@@ -50,7 +50,7 @@ const Login = () => {
                 localStorage.setItem('token', token);
                 localStorage.setItem('user', JSON.stringify(user));
                 checkLoginStatus();
-                
+
                 navigate('/dashboard');
             }
         } catch (error) {
