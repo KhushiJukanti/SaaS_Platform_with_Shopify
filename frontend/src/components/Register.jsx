@@ -51,7 +51,7 @@ const Register = () => {
                 email: '',
                 password: '',
             });
-            navigate('/'); // Navigate to login after successful registration
+            navigate('/');
         } catch (error) {
             setErrorMessage('Error registering user  already exist.');
         }
