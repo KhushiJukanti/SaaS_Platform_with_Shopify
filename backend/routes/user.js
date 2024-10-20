@@ -7,6 +7,6 @@ const auth = require('../middleware/userauth');
 router.post('/register', UserControllers.Register);
 router.post('/login', UserControllers.Login);
 
-router.get('/orders',auth, UserControllers.getShopifyOrders); // Only authenticated users can access this route
+router.get('/orders', UserControllers.getShopifyOrders); // Only authenticated users can access this route
 
 module.exports = router

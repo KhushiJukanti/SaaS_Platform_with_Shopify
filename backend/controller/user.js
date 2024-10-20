@@ -78,8 +78,17 @@ const getShopifyOrders = async (req, res) => {
         }
 
         // Calculating total orders and total sales
-        const totalOrders = orders.length;
-        const totalSales = orders.reduce((sum, order) => sum + parseFloat(order.total_price), 0);
+        // const totalOrders = orders.length;
+        // const totalSales = orders.reduce((sum, order) => sum + parseFloat(order.total_price), 0);
+
+
+        const fiveDaysAgo  = new Date();
+        fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5)
+
+        const recentOrdres = orders.filter(order => new Date(order.created_at) >= fiveDaysAgo)
+
+        const totalOrders = recentOrdres.length;
+        const totalSales = recentOrdres.reduce((sum, order) => sum + parseFloat(order.total_price), 0);
 
         // Basic conversion rate calculation (assuming 1000 visitors for simplicity)
         const conversionRate = (totalOrders / 1000) * 100;
@@ -99,3 +108,11 @@ const getShopifyOrders = async (req, res) => {
 
 
 module.exports = { Register, Login, getShopifyOrders }
+
+
+
+
+
+
+
+
